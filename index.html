@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vedic Astrology</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#070b16;--card:#11182a;--line:#27334f;--text:#f7f8fb;--muted:#9da8bd;--accent:#d9a441}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#182445 0,#070b16 40%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui}
+.wrap{max-width:720px;margin:auto;padding:20px 16px 80px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.logo{font-size:24px;font-weight:800}.pill{border:1px solid var(--line);padding:8px 12px;border-radius:99px;color:var(--muted)}
+.hero{padding:22px;border:1px solid var(--line);border-radius:26px;background:linear-gradient(145deg,#17233e,#0d1322);margin-bottom:14px}
+.hero h1{font-size:28px;margin:0 0 8px}.hero p{color:var(--muted);margin:0;line-height:1.5}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:rgba(17,24,42,.92);border:1px solid var(--line);border-radius:20px;padding:18px;min-height:118px}.card b{display:block;font-size:17px;margin-top:10px}.card span{color:var(--muted);font-size:13px}.icon{font-size:28px}
+.section{margin:24px 0 12px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}.planet{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #1d263b}.planet:last-child{border:0}.gold{color:var(--accent)}
+button{font:inherit;color:inherit;background:none;border:0;width:100%;text-align:left}
+.screen{display:none}.screen.active{display:block}.back{color:var(--muted);margin-bottom:16px;cursor:pointer}.row{display:flex;gap:10px}.input{width:100%;padding:13px;border-radius:14px;border:1px solid var(--line);background:#0b1120;color:#fff;margin:7px 0}.primary{background:var(--accent);color:#101010;text-align:center;padding:14px;border-radius:14px;font-weight:700;margin-top:8px}
+.notice{padding:14px;border:1px solid var(--line);border-radius:16px;color:var(--muted);line-height:1.5}
+</style></head>
+<body><div class="wrap">
+<div class="top"><div class="logo">🪐 Vedic Astrology</div><div class="pill">Джйотиш</div></div>
+
+<div id="home" class="screen active">
+<div class="hero"><h1>Твоя карта. Твои циклы.</h1><p>Персональный кабинет ведической астрологии с расчётом карты и прогнозами.</p></div>
+<div class="grid">
+<button class="card" onclick="show('chart')"><div class="icon">🔮</div><b>Натальная карта</b><span>Планеты • Лагна • Накшатра</span></button>
+<button class="card" onclick="show('annual')"><div class="icon">📅</div><b>Прогноз на год</b><span>12 месяцев и ключевые темы</span></button>
+<button class="card" onclick="show('compat')"><div class="icon">❤️</div><b>Совместимость</b><span>Сравнение двух карт</span></button>
+<button class="card" onclick="show('daily')"><div class="icon">🌞</div><b>Сегодня</b><span>Ежедневный прогноз</span></button>
+</div>
+<div class="section">Премиум</div>
+<div class="card"><div class="icon">💎</div><b>Расширенный отчёт</b><span>Даши • Навамша • подробные периоды • PDF</span><div class="primary" onclick="premium()">Получить доступ</div></div>
+</div>
+
+<div id="chart" class="screen"><div class="back" onclick="show('home')">← Назад</div><h2>🔮 Натальная карта</h2>
+<div id="chartOut" class="notice">Введите данные рождения.</div>
+<div class="section">Данные рождения</div>
+<input id="day" class="input" type="number" placeholder="День">
+<input id="month" class="input" type="number" placeholder="Месяц">
+<input id="year" class="input" type="number" placeholder="Год">
+<input id="hour" class="input" type="number" placeholder="Час">
+<input id="minute" class="input" type="number" placeholder="Минута">
+<input id="city" class="input" placeholder="Город: Алматы">
+<div class="primary" onclick="saveProfile()">Рассчитать карту</div></div>
+
+<div id="annual" class="screen"><div class="back" onclick="show('home')">← Назад</div><h2>📅 Прогноз на год</h2><div id="annualOut" class="notice">Загрузка…</div></div>
+<div id="daily" class="screen"><div class="back" onclick="show('home')">← Назад</div><h2>🌞 Гороскоп на сегодня</h2><div id="dailyOut" class="notice">Загрузка…</div></div>
+<div id="compat" class="screen"><div class="back" onclick="show('home')">← Назад</div><h2>❤️ Совместимость</h2><div class="notice">В следующем API-этапе добавим ввод второй даты рождения и полноценный Ashtakoota/Kuta Milan.</div></div>
+</div>
+<script>
+const tg=window.Telegram.WebApp; tg.expand();
+let uid=(tg.initDataUnsafe&&tg.initDataUnsafe.user&&tg.initDataUnsafe.user.id)||0;
+function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='annual')load('/api/annual/'+uid,'annualOut');if(id==='daily')load('/api/daily/'+uid,'dailyOut');}
+async function saveProfile(){let p={user_id:uid,day:+day.value,month:+month.value,year:+year.value,hour:+hour.value,minute:+minute.value,city:city.value};let r=await fetch('/api/profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});let d=await r.json();if(d.detail){chartOut.textContent=d.detail;return}chartOut.innerHTML='<b>Лагна:</b> '+d.lagna.sign+' '+d.lagna.degree+'°<br><b>Накшатра:</b> '+d.nakshatra+' • пада '+d.pada+'<div class="section">Планеты</div>'+d.planets.map(x=>'<div class="planet"><span>'+x.name+'</span><span class="gold">'+x.sign+' '+x.degree+'°</span></div>').join('');}
+async function load(url,id){let r=await fetch(url);let d=await r.json();if(d.detail){document.getElementById(id).textContent=d.detail;return}if(d.months){document.getElementById(id).innerHTML=d.months.map(x=>'<div class="planet"><span>Месяц '+x.month+'</span><span>Юпитер: дом '+x.jupiter_house+' • Сатурн: дом '+x.saturn_house+'</span></div>').join('')}else document.getElementById(id).innerHTML='<b>'+d.title+'</b><br><br>'+d.text;}
+function premium(){alert('Премиум-оплата подключается через Telegram Stars на серверной стороне.');}
+</script></body></html>
