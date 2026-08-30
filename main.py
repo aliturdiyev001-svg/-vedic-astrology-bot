@@ -121,8 +121,7 @@ def validate_webapp(init_data):
     user=json.loads(q["user"][0]); return int(user["id"])
 
 @app.get("/")
-async def index(): return FileResponse("webapp/index.html")
-
+async def index(): return FileResponse("index.html")
 @app.get("/health")
 async def health(): return {"ok":True}
 
