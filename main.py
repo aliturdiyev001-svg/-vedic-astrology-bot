@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
-from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+from aiogram.types import Message, WebAppInfo
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 load_dotenv()
@@ -46,7 +46,7 @@ def julian(dt):
     return swe.julday(dt.year,dt.month,dt.day,dt.hour+dt.minute/60)
 
 def planet_lon(j,p):
-    x,_=swe.calc_ut(j,p,swe.FLG_SWIEPH|swe.FLG_SIDEREAL)
+    x,_,_ = swe.calc_ut(j,p,swe.FLG_SWIEPH|swe.FLG_SIDEREAL)
     return x[0]%360
 
 def calculate(b):
@@ -134,6 +134,13 @@ async def profile(b:Birth):
       (b.user_id,b.day,b.month,b.year,b.hour,b.minute,b.city))
     await con.commit(); await con.close()
     return chart_payload(c)
+
+@app.delete("/api/profile/{user_id}")
+async def delete_profile(user_id:int):
+    con=await db()
+    await con.execute("DELETE FROM users WHERE user_id=?",(user_id,))
+    await con.commit(); await con.close()
+    return {"ok":True}
 
 @app.get("/api/chart/{user_id}")
 async def chart_api(user_id:int):

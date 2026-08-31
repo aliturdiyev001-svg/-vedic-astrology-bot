@@ -1,55 +1,860 @@
 <!doctype html>
-<html lang="ru"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#131313">
 <title>Vedic Astrology</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Arsenal:wght@400;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{--bg:#070b16;--card:#11182a;--line:#27334f;--text:#f7f8fb;--muted:#9da8bd;--accent:#d9a441}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#182445 0,#070b16 40%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui}
-.wrap{max-width:720px;margin:auto;padding:20px 16px 80px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.logo{font-size:24px;font-weight:800}.pill{border:1px solid var(--line);padding:8px 12px;border-radius:99px;color:var(--muted)}
-.hero{padding:22px;border:1px solid var(--line);border-radius:26px;background:linear-gradient(145deg,#17233e,#0d1322);margin-bottom:14px}
-.hero h1{font-size:28px;margin:0 0 8px}.hero p{color:var(--muted);margin:0;line-height:1.5}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:rgba(17,24,42,.92);border:1px solid var(--line);border-radius:20px;padding:18px;min-height:118px}.card b{display:block;font-size:17px;margin-top:10px}.card span{color:var(--muted);font-size:13px}.icon{font-size:28px}
-.section{margin:24px 0 12px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}.planet{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #1d263b}.planet:last-child{border:0}.gold{color:var(--accent)}
-button{font:inherit;color:inherit;background:none;border:0;width:100%;text-align:left}
-.screen{display:none}.screen.active{display:block}.back{color:var(--muted);margin-bottom:16px;cursor:pointer}.row{display:flex;gap:10px}.input{width:100%;padding:13px;border-radius:14px;border:1px solid var(--line);background:#0b1120;color:#fff;margin:7px 0}.primary{background:var(--accent);color:#101010;text-align:center;padding:14px;border-radius:14px;font-weight:700;margin-top:8px}
-.notice{padding:14px;border:1px solid var(--line);border-radius:16px;color:var(--muted);line-height:1.5}
-</style></head>
-<body><div class="wrap">
-<div class="top"><div class="logo">🪐 Vedic Astrology</div><div class="pill">Джйотиш</div></div>
+:root{
+  --bg:#131313;
+  --bg-soft:#171717;
+  --card:#191919;
+  --card-2:#1f1f1f;
+  --line:#343434;
+  --line-soft:#2b2b2b;
+  --text:#f4f4f4;
+  --muted:#a0a0a0;
+  --soft:#7a7a7a;
+  --accent:#ff6c22;
+  --accent-2:#ffad45;
+  --accent-3:#33c15e;
+  --accent-4:#bf9f86;
+  --bronze:#bf9f86;
+  --bronze-dark:#a08168;
+  --wheel-line:rgba(255,255,255,.14);
+  --wheel-zodiac-glyph:#e9e2d8;
+  --wheel-planet-bg:#232323;
+  --shadow:0 40px 80px -20px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  font-family:"Arsenal",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  font-size:17px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.06), transparent 25%),
+    radial-gradient(circle at 12% 10%, rgba(255,108,34,.07), transparent 20%),
+    #131313;
+  overflow-x:hidden;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px);
+  background-size:140px 140px;
+  opacity:.18;
+}
+h1,h2,h3,.section-title,.options-menu-label,.brand-copy strong{
+  font-family:"Playfair Display",Georgia,"Times New Roman",serif;
+  font-weight:600;
+}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit}
+.hidden{display:none !important}
+.screen{
+  width:min(740px, calc(100% - 16px));
+  margin:0 auto;
+  padding:18px 0 90px;
+}
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.brand-mark{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  background:
+    radial-gradient(circle at 32% 30%, rgba(255,255,255,.95), rgba(255,255,255,.18) 18%, transparent 19%),
+    radial-gradient(circle at 50% 50%, rgba(255,108,34,.95), rgba(191,159,134,.92));
+  box-shadow:0 10px 24px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.2);
+  position:relative;
+}
+.brand-mark::after{
+  content:"";
+  position:absolute;
+  inset:48% -18% auto -18%;
+  height:8px;
+  border-radius:999px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.72), transparent);
+  transform:rotate(-16deg);
+}
+.brand-copy{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.brand-copy strong{
+  font-size:14px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.brand-copy span{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.2;
+}
+.top-link{
+  font-size:13px;
+  color:var(--muted);
+  padding:9px 12px;
+  border-radius:6px;
+  border:1px solid var(--line);
+  background:none;
+  transition:color .15s,border-color .15s;
+}
+.top-link:hover{color:var(--text);border-color:var(--bronze)}
+h2{
+  margin:0;
+  font-size:clamp(32px, 5vw, 44px);
+  line-height:1.02;
+  letter-spacing:-.05em;
+  font-weight:600;
+}
+.screen > h2{
+  margin-top:6px;
+}
+.chip-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:14px 0 18px;
+}
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  border-radius:999px;
+  padding:10px 14px;
+  min-height:40px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+  color:var(--muted);
+  font-size:15px;
+  line-height:1;
+}
+.chip.active{
+  color:var(--text);
+  background:rgba(255,255,255,.06);
+  border-color:var(--bronze);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+}
+.options-menu,
+.wheel-card,
+.section-card,
+.card,
+.product-card{
+  border:1px solid var(--line);
+  background:#191919;
+  box-shadow:var(--shadow);
+}
+.options-menu{
+  border-top:2px solid var(--bronze);
+  border-radius:8px;
+  padding:18px;
+  margin-bottom:16px;
+}
+.options-menu h2{
+  font-size:24px;
+  line-height:1.05;
+  margin-bottom:10px;
+}
+.options-menu-item{
+  width:100%;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:12px;
+  text-align:left;
+  border:0;
+  border-top:1px solid rgba(255,255,255,.08);
+  background:transparent;
+  color:inherit;
+  padding:14px 0;
+  cursor:pointer;
+}
+.options-menu-item:first-of-type{border-top:0}
+.options-menu-icon{
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:rgba(255,255,255,.06);
+  font-size:23px;
+}
+.options-menu-text{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.options-menu-label{
+  font-size:18px;
+  line-height:1.1;
+  font-weight:600;
+  color:var(--text);
+}
+.options-menu-desc{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.35;
+}
+.options-menu-arrow{
+  color:var(--bronze);
+  font-size:28px;
+  line-height:1;
+}
+.wheel-card{
+  padding:12px;
+  margin-bottom:16px;
+  border-radius:8px;
+  border-top:2px solid var(--bronze);
+}
+.wheel-card svg{
+  width:100%;
+  height:auto;
+  display:block;
+}
+.section-card,
+.card,
+.product-card{
+  border-radius:8px;
+  border-top:2px solid var(--bronze);
+  padding:20px;
+  margin-bottom:16px;
+}
+.section-card-header{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin-bottom:10px;
+}
+.section-icon{
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:rgba(255,255,255,.06);
+  font-size:17px;
+  flex:0 0 auto;
+}
+.section-title{
+  margin:0;
+  font-size:22px;
+  line-height:1.1;
+  font-weight:600;
+}
+.section-text,
+.product-card p,
+.card p{
+  margin:0;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.68;
+}
+.section-card.form-card h3{
+  margin:0 0 4px;
+  font-size:20px;
+  line-height:1.15;
+}
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-top:12px;
+}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{
+  font-size:14px;
+  color:#cfcfcf;
+}
+.input{
+  width:100%;
+  min-height:48px;
+  padding:12px 14px;
+  border-radius:6px;
+  border:1px solid var(--line);
+  background:#101010;
+  color:var(--text);
+  outline:none;
+  transition:border-color .15s;
+}
+.input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(255,108,34,.18);
+}
+.btn,
+.btn-secondary,
+.link-btn,
+.rating-btn,
+.sticky-options-bar{
+  border:0;
+  border-radius:6px;
+  min-height:48px;
+  padding:12px 16px;
+  font-size:16px;
+  cursor:pointer;
+}
+.btn{
+  background:linear-gradient(135deg, #ff6c22 0%, #ff9712 100%);
+  color:#1a0e02;
+  font-weight:700;
+  box-shadow:0 12px 30px rgba(255,108,34,.28);
+  transition:transform .12s;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn-secondary{
+  background:rgba(255,255,255,.06);
+  color:var(--text);
+  border:1px solid rgba(255,255,255,.10);
+}
+.link-btn{
+  background:transparent;
+  color:var(--muted);
+  padding:0;
+  min-height:unset;
+  text-align:left;
+  font-size:15px;
+}
+#errorOut{
+  margin:0 0 10px;
+  color:#ff4652;
+  font-size:14px;
+  line-height:1.45;
+}
+.rating-widget h2,
+.product-card h2,
+.card h2{
+  margin:0 0 8px;
+  font-size:22px;
+  line-height:1.1;
+  font-weight:600;
+}
+.rating-widget p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+.rating-scale{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+}
+.rating-btn{
+  width:calc(20% - 7px);
+  min-width:46px;
+  padding:10px 0;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  color:var(--text);
+}
+.rating-btn.active{
+  background:rgba(255,108,34,.18);
+  border-color:var(--accent);
+}
+.collapse-teaser{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  align-items:flex-start;
+}
+.collapse-teaser p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+.product-includes{
+  list-style:none;
+  padding:0;
+  margin:14px 0 16px;
+}
+.product-includes li{
+  position:relative;
+  padding-left:20px;
+  margin:8px 0;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.45;
+}
+.product-includes li::before{
+  content:"✓";
+  position:absolute;
+  left:0;
+  top:0;
+  color:var(--bronze);
+  font-weight:700;
+}
+.more-block{
+  margin-top:4px;
+}
+.product-card h2{margin-bottom:10px}
+.product-card .btn{width:100%}
+.settings-card .actions{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.sticky-options-bar{
+  position:fixed;
+  left:12px;
+  right:12px;
+  bottom:12px;
+  width:calc(100% - 24px);
+  max-width:740px;
+  margin:0 auto;
+  display:block;
+  color:#1a0e02;
+  background:linear-gradient(135deg, #ff6c22 0%, #ff9712 100%);
+  box-shadow:0 16px 30px rgba(255,108,34,.28);
+}
+.breadcrumbs{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:10px 0 4px;
+  color:var(--muted);
+  font-size:12px;
+}
+@media (max-width: 720px){
+  .screen{width:min(100% - 10px, 740px);padding-top:12px}
+  .topbar{align-items:flex-start;flex-direction:column}
+  .top-link{padding:8px 10px}
+  .options-menu-item{grid-template-columns:auto 1fr;grid-template-rows:auto auto}
+  .options-menu-arrow{grid-column:2;justify-self:end;margin-top:-2px}
+  .form-grid{grid-template-columns:1fr}
+  .rating-btn{width:calc(20% - 7px)}
+  .sticky-options-bar{left:6px;right:6px;bottom:6px;width:calc(100% - 12px)}
+}
+</style>
+</head>
+<body>
+<div class="screen" style="padding-bottom: 90px;">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"></div>
+      <div class="brand-copy">
+        <strong>Vedic Astrology</strong>
+        <span>Ведическая карта и персональные разборы</span>
+      </div>
+    </div>
+    <a class="top-link" href="#options-start">Смотреть разборы</a>
+  </div>
 
-<div id="home" class="screen active">
-<div class="hero"><h1>Твоя карта. Твои циклы.</h1><p>Персональный кабинет ведической астрологии с расчётом карты и прогнозами.</p></div>
-<div class="grid">
-<button class="card" onclick="show('chart')"><div class="icon">🔮</div><b>Натальная карта</b><span>Планеты • Лагна • Накшатра</span></button>
-<button class="card" onclick="show('annual')"><div class="icon">📅</div><b>Прогноз на год</b><span>12 месяцев и ключевые темы</span></button>
-<button class="card" onclick="show('compat')"><div class="icon">❤️</div><b>Совместимость</b><span>Сравнение двух карт</span></button>
-<button class="card" onclick="show('daily')"><div class="icon">🌞</div><b>Сегодня</b><span>Ежедневный прогноз</span></button>
-</div>
-<div class="section">Премиум</div>
-<div class="card"><div class="icon">💎</div><b>Расширенный отчёт</b><span>Даши • Навамша • подробные периоды • PDF</span><div class="primary" onclick="premium()">Получить доступ</div></div>
+  <h2>Ваша натальная карта. Понятным языком</h2>
+
+  <div class="options-menu hidden" id="optionsMenu">
+    <h2>4 способа узнать больше</h2>
+    <button class="options-menu-item" type="button" data-target="option-personal_calendar"><span class="options-menu-icon">📅</span><span class="options-menu-text"><span class="options-menu-label">Личный календарь</span><span class="options-menu-desc">Удачные дни по 12 сферам жизни</span></span><span class="options-menu-arrow">→</span></button>
+    <button class="options-menu-item" type="button" data-target="option-daily_horoscope"><span class="options-menu-icon">🔮</span><span class="options-menu-text"><span class="options-menu-label">Гороскоп на каждый день</span><span class="options-menu-desc">Короткое сообщение каждое утро</span></span><span class="options-menu-arrow">→</span></button>
+    <button class="options-menu-item" type="button" data-target="option-decision_report"><span class="options-menu-icon">⚖️</span><span class="options-menu-text"><span class="options-menu-label">Разбор решения</span><span class="options-menu-desc">Опишите ситуацию — разберём через карту</span></span><span class="options-menu-arrow">→</span></button>
+    <button class="options-menu-item" type="button" data-target="option-compatibility"><span class="options-menu-icon">💞</span><span class="options-menu-text"><span class="options-menu-label">Совместимость</span><span class="options-menu-desc">Насколько вы подходите друг другу</span></span><span class="options-menu-arrow">→</span></button>
+  </div>
+
+  <div class="section-card form-card" id="birthCard">
+    <div class="section-card-header">
+      <span class="section-icon">✦</span>
+      <div>
+        <h3 class="section-title">Введите данные рождения</h3>
+        <p class="section-text">Чтобы все разделы работали, заполните дату, время и город рождения.</p>
+      </div>
+    </div>
+    <p id="errorOut" class="hidden"></p>
+    <div class="form-grid">
+      <div class="field"><label for="day">День</label><input id="day" class="input" type="number" placeholder="30"></div>
+      <div class="field"><label for="month">Месяц</label><input id="month" class="input" type="number" placeholder="8"></div>
+      <div class="field"><label for="year">Год</label><input id="year" class="input" type="number" placeholder="1995"></div>
+      <div class="field"><label for="hour">Час</label><input id="hour" class="input" type="number" placeholder="19"></div>
+      <div class="field"><label for="minute">Минута</label><input id="minute" class="input" type="number" placeholder="19"></div>
+      <div class="field"><label for="city">Город</label><input id="city" class="input" placeholder="Алматы"></div>
+    </div>
+    <div class="breadcrumbs">Поддерживаются: Алматы, Астана, Москва, Дубай, Лондон, Нью-Йорк</div>
+    <div style="margin-top:14px"><button class="btn" id="calcBtn" type="button">Рассчитать карту</button></div>
+  </div>
+
+  <div id="analysis" class="hidden">
+    <div class="chip-row" id="chipRow"></div>
+
+    <div class="wheel-card" aria-label="Колесо натальной карты">
+      <div id="wheelMount"></div>
+    </div>
+
+  <div class="section-card">
+    <div class="section-card-header"><span class="section-icon">✨</span><span class="section-title">Ваш архетип</span></div>
+    <p class="section-text" id="archetypeText">Ваш архетип — Мастер ремесла: доводит детали до совершенства, пока другие уже сдались.</p>
+  </div>
+
+  <div class="section-card">
+    <div class="section-card-header"><span class="section-icon">☀️</span><span class="section-title">Солнце — ваша суть</span></div>
+    <p class="section-text" id="sunText">Заполните данные рождения, чтобы получить персональный разбор.</p>
+  </div>
+
+  <div class="section-card">
+    <div class="section-card-header"><span class="section-icon">🌙</span><span class="section-title">Луна — внутренний мир</span></div>
+    <p class="section-text" id="moonText">Заполните данные рождения, чтобы получить персональный разбор.</p>
+  </div>
+
+  <div class="section-card">
+    <div class="section-card-header"><span class="section-icon">🌅</span><span class="section-title">Асцендент — первое впечатление</span></div>
+    <p class="section-text" id="ascText">Заполните данные рождения, чтобы увидеть, как вы проявляетесь в новых ситуациях.</p>
+  </div>
+
+  <div class="section-card">
+    <div class="section-card-header"><span class="section-icon">💬</span><span class="section-title">Меркурий — мышление и общение</span></div>
+    <p class="section-text" id="mercText">Заполните данные рождения, чтобы получить персональный разбор.</p>
+  </div>
+
+  <div class="section-card">
+    <div class="section-card-header"><span class="section-icon">💗</span><span class="section-title">Венера — отношения и ценности</span></div>
+    <p class="section-text" id="venusText">Заполните данные рождения, чтобы получить персональный разбор.</p>
+  </div>
+
+  <div class="section-card">
+    <div class="section-card-header"><span class="section-icon">♂</span><span class="section-title">Марс — энергия и действия</span></div>
+    <p class="section-text" id="marsText">Заполните данные рождения, чтобы получить персональный разбор.</p>
+  </div>
+
+  <div class="section-card collapse-teaser" id="teaserCard">
+    <p>Это только начало — дальше ещё 11 блоков.</p>
+    <button class="btn btn-secondary" id="expandBtn" type="button">Показать весь разбор →</button>
+    <button class="link-btn" id="jumpMoreBtn" type="button">Или сразу к остальным разделам ↓</button>
+  </div>
+
+  <div class="card rating-widget">
+    <h2>Насколько это похоже на вас?</h2>
+    <p>Оцените, насколько разбор соответствует вам, по шкале от 1 до 10</p>
+    <div class="rating-scale" id="ratingScale">
+      <button class="rating-btn" type="button">1</button><button class="rating-btn" type="button">2</button><button class="rating-btn" type="button">3</button><button class="rating-btn" type="button">4</button><button class="rating-btn" type="button">5</button><button class="rating-btn" type="button">6</button><button class="rating-btn" type="button">7</button><button class="rating-btn" type="button">8</button><button class="rating-btn" type="button">9</button><button class="rating-btn" type="button">10</button>
+    </div>
+  </div>
+
+  <div id="moreContent" class="more-block hidden">
+    <div id="options-start"></div>
+
+    <div class="product-card" id="option-personal_calendar">
+      <h2>Личный календарь</h2>
+      <p id="annualText">Сначала заполните данные рождения.</p>
+      <ul class="product-includes">
+        <li>Календарь на текущий месяц</li>
+        <li>Разбивка по всем 12 сферам жизни</li>
+        <li>Основано на реальных транзитах</li>
+      </ul>
+      <button class="btn" type="button" data-action="open-calendar">Открыть календарь</button>
+    </div>
+
+    <div class="product-card" id="option-daily_horoscope">
+      <h2>Гороскоп на каждый день</h2>
+      <p id="dailyText">Сначала заполните данные рождения.</p>
+      <ul class="product-includes">
+        <li>Сообщение каждое утро в 9:00</li>
+        <li>Учитывает вашу натальную карту</li>
+        <li>Отмена в любой момент</li>
+      </ul>
+      <button class="btn" type="button" data-action="open-daily">Подписаться бесплатно</button>
+    </div>
+
+    <div class="product-card" id="option-decision_report">
+      <h2>Примите важное решение на основе вашей натальной карты</h2>
+      <p>Опишите ситуацию одним сообщением — и получите разбор через призму карты: ваш стиль принятия решений, на что обратить внимание, где может быть возможность.</p>
+      <ul class="product-includes">
+        <li>Разбор в один клик — без анкеты</li>
+        <li>Ваш стиль принятия решений</li>
+        <li>Вопросы для самопроверки</li>
+      </ul>
+      <button class="btn" type="button" data-action="open-decision">Разобрать решение</button>
+    </div>
+
+    <div class="product-card" id="option-compatibility">
+      <h2>Проверка совместимости с человеком</h2>
+      <p>Сравнение вашей натальной карты с картой партнёра, друга или коллеги по 4 сферам — характер, эмоции, общение, притяжение.</p>
+      <ul class="product-includes">
+        <li>Подробный разбор по 4 сферам</li>
+        <li>Знаки обоих людей по каждой сфере</li>
+        <li>Общий процент совместимости</li>
+      </ul>
+      <button class="btn" type="button" data-action="open-compatibility">Проверить совместимость</button>
+    </div>
+
+    <div class="product-card settings-card" id="option-settings">
+      <h2>Настройки и удаление данных</h2>
+      <p>Можно сбросить текущие данные профиля и начать заново. Это очистит запись пользователя в базе.</p>
+      <div class="actions">
+        <button class="btn-secondary" id="resetBtn" type="button">Сбросить профиль</button>
+        <button class="link-btn" id="showTopBtn" type="button">Вернуться наверх</button>
+      </div>
+    </div>
+  </div>
+  </div>
 </div>
 
-<div id="chart" class="screen"><div class="back" onclick="show('home')">← Назад</div><h2>🔮 Натальная карта</h2>
-<div id="chartOut" class="notice">Введите данные рождения.</div>
-<div class="section">Данные рождения</div>
-<input id="day" class="input" type="number" placeholder="День">
-<input id="month" class="input" type="number" placeholder="Месяц">
-<input id="year" class="input" type="number" placeholder="Год">
-<input id="hour" class="input" type="number" placeholder="Час">
-<input id="minute" class="input" type="number" placeholder="Минута">
-<input id="city" class="input" placeholder="Город: Алматы">
-<div class="primary" onclick="saveProfile()">Рассчитать карту</div></div>
+<button class="sticky-options-bar hidden" id="stickyBar" type="button">Смотреть все разборы ↓</button>
 
-<div id="annual" class="screen"><div class="back" onclick="show('home')">← Назад</div><h2>📅 Прогноз на год</h2><div id="annualOut" class="notice">Загрузка…</div></div>
-<div id="daily" class="screen"><div class="back" onclick="show('home')">← Назад</div><h2>🌞 Гороскоп на сегодня</h2><div id="dailyOut" class="notice">Загрузка…</div></div>
-<div id="compat" class="screen"><div class="back" onclick="show('home')">← Назад</div><h2>❤️ Совместимость</h2><div class="notice">В следующем API-этапе добавим ввод второй даты рождения и полноценный Ashtakoota/Kuta Milan.</div></div>
-</div>
 <script>
-const tg=window.Telegram.WebApp; tg.expand();
-let uid=(tg.initDataUnsafe&&tg.initDataUnsafe.user&&tg.initDataUnsafe.user.id)||0;
-function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='annual')load('/api/annual/'+uid,'annualOut');if(id==='daily')load('/api/daily/'+uid,'dailyOut');}
-async function saveProfile(){let p={user_id:uid,day:+day.value,month:+month.value,year:+year.value,hour:+hour.value,minute:+minute.value,city:city.value};let r=await fetch('/api/profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});let d=await r.json();if(d.detail){chartOut.textContent=d.detail;return}chartOut.innerHTML='<b>Лагна:</b> '+d.lagna.sign+' '+d.lagna.degree+'°<br><b>Накшатра:</b> '+d.nakshatra+' • пада '+d.pada+'<div class="section">Планеты</div>'+d.planets.map(x=>'<div class="planet"><span>'+x.name+'</span><span class="gold">'+x.sign+' '+x.degree+'°</span></div>').join('');}
-async function load(url,id){let r=await fetch(url);let d=await r.json();if(d.detail){document.getElementById(id).textContent=d.detail;return}if(d.months){document.getElementById(id).innerHTML=d.months.map(x=>'<div class="planet"><span>Месяц '+x.month+'</span><span>Юпитер: дом '+x.jupiter_house+' • Сатурн: дом '+x.saturn_house+'</span></div>').join('')}else document.getElementById(id).innerHTML='<b>'+d.title+'</b><br><br>'+d.text;}
-function premium(){alert('Премиум-оплата подключается через Telegram Stars на серверной стороне.');}
-</script></body></html>
+const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+if(tg && tg.expand) tg.expand();
+const uid = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) || 0;
+const SIGN_GLYPHS=["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
+const PLANET_GLYPHS={"Солнце":"☉","Луна":"☽","Марс":"♂","Меркурий":"☿","Юпитер":"♃","Венера":"♀","Сатурн":"♄","Раху":"☊","Кету":"☋"};
+const MORE = document.getElementById("moreContent");
+const WHEEL_MOUNT = document.getElementById("wheelMount");
+const ANALYSIS = document.getElementById("analysis");
+
+function showAnalysis(){
+  if(!ANALYSIS) return;
+  ANALYSIS.classList.remove("hidden");
+  const menu=document.getElementById("optionsMenu");
+  if(menu) menu.classList.remove("hidden");
+  const sticky=document.getElementById("stickyBar");
+  if(sticky) sticky.classList.remove("hidden");
+  ANALYSIS.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function showError(text){
+  const box=document.getElementById("errorOut");
+  if(!box) return;
+  if(!text){box.classList.add("hidden");box.textContent="";return;}
+  box.classList.remove("hidden");
+  box.textContent=text;
+}
+
+function byName(planets,name){
+  const p=planets.find(x=>x.name===name);
+  return p||{name:name,sign:"-",degree:0,lon:0};
+}
+
+function polar(cx, cy, r, deg){
+  const rad = (deg - 90) * Math.PI / 180;
+  return { x: cx + Math.cos(rad) * r, y: cy + Math.sin(rad) * r };
+}
+
+function sectorPath(cx, cy, inner, outer, startDeg, endDeg){
+  const p1 = polar(cx, cy, outer, startDeg);
+  const p2 = polar(cx, cy, outer, endDeg);
+  const p3 = polar(cx, cy, inner, endDeg);
+  const p4 = polar(cx, cy, inner, startDeg);
+  const large = (endDeg - startDeg) > 180 ? 1 : 0;
+  return `M ${p1.x} ${p1.y} A ${outer} ${outer} 0 ${large} 1 ${p2.x} ${p2.y} L ${p3.x} ${p3.y} A ${inner} ${inner} 0 ${large} 0 ${p4.x} ${p4.y} Z`;
+}
+
+function buildWheelSvg(payload){
+  const cx = 210, cy = 210, outer = 192, inner = 162, core = 54;
+  const fills = [
+    "rgba(224, 122, 95, 0.14)",
+    "rgba(129, 178, 154, 0.14)",
+    "rgba(116, 103, 232, 0.10)",
+    "rgba(93, 156, 199, 0.14)"
+  ];
+  const parts = [];
+  for(let i=0;i<12;i++){
+    const start = i * 30;
+    const end = start + 30;
+    parts.push(`<path d="${sectorPath(cx, cy, inner, outer, start, end)}" fill="${fills[i % fills.length]}" stroke="var(--wheel-line)" stroke-width="1"></path>`);
+  }
+  for(let i=0;i<12;i++){
+    const angle = i * 30 + 15;
+    const p = polar(cx, cy, 180, angle);
+    parts.push(`<text x="${p.x}" y="${p.y}" text-anchor="middle" dominant-baseline="central" font-size="14" fill="var(--wheel-zodiac-glyph)">${SIGN_GLYPHS[i]}</text>`);
+  }
+  parts.push(`<circle cx="${cx}" cy="${cy}" r="${outer}" fill="none" stroke="var(--wheel-line)" stroke-width="1.5"></circle>`);
+  parts.push(`<circle cx="${cx}" cy="${cy}" r="${inner}" fill="none" stroke="var(--wheel-line)" stroke-width="1"></circle>`);
+  parts.push(`<circle cx="${cx}" cy="${cy}" r="${core}" fill="none" stroke="var(--wheel-line)" stroke-width="1"></circle>`);
+  payload.planets.forEach((p, idx)=>{
+    const angle = p.lon || 0;
+    const r = 118 + (idx % 3) * 9;
+    const point = polar(cx, cy, r, angle);
+    const glyph = PLANET_GLYPHS[p.name] || p.name[0];
+    parts.push(`<g><circle cx="${point.x}" cy="${point.y}" r="10" fill="var(--wheel-planet-bg)" stroke="var(--wheel-line)" stroke-width="0.75"></circle><text x="${point.x}" y="${point.y}" text-anchor="middle" dominant-baseline="central" font-size="12" fill="var(--text)">${glyph}</text></g>`);
+  });
+  parts.push(`<text x="210" y="206" text-anchor="middle" dominant-baseline="central" font-size="20" fill="var(--text)" font-weight="600">Натальная карта</text>`);
+  parts.push(`<text x="210" y="228" text-anchor="middle" dominant-baseline="central" font-size="11" fill="var(--muted)">Лахири • сидерический зодиак</text>`);
+  return `<svg viewBox="0 0 420 420" role="img" aria-label="Колесо натальной карты" style="width:100%;height:auto;">${parts.join("")}</svg>`;
+}
+
+function setChips(data){
+  const sun=byName(data.planets,"Солнце");
+  const moon=byName(data.planets,"Луна");
+  const chipRow=document.getElementById("chipRow");
+  if(!chipRow) return;
+  chipRow.innerHTML=`<span class="chip active">☀ ${sun.sign}</span><span class="chip active">☾ ${moon.sign}</span>`;
+}
+
+function setTexts(data){
+  const sun=byName(data.planets,"Солнце");
+  const moon=byName(data.planets,"Луна");
+  const merc=byName(data.planets,"Меркурий");
+  const venus=byName(data.planets,"Венера");
+  const mars=byName(data.planets,"Марс");
+  document.getElementById("archetypeText").textContent = `Ваш архетип — ${(data.lagna && data.lagna.sign === "Дева") ? "Мастер ремесла" : "Практик пути"}: асцендент в ${data.lagna && data.lagna.sign ? data.lagna.sign : "неизвестен"} помогает выстраивать жизнь через последовательные шаги.`;
+  document.getElementById("sunText").textContent = `Солнце в ${sun.sign} (${sun.degree}°) — ваша базовая жизненная энергия и то, как вы проявляете себя вовне.`;
+  document.getElementById("moonText").textContent = `Луна в ${moon.sign} (${moon.degree}°) — ваш внутренний ритм, эмоциональная память и чувство опоры.`;
+  document.getElementById("ascText").textContent = data.lagna && data.lagna.sign ? `Асцендент в ${data.lagna.sign} (${data.lagna.degree}°) — первое впечатление, стиль действий и то, как вас считывают новые люди.` : "Асцендент пока не рассчитан.";
+  document.getElementById("mercText").textContent = `Меркурий в ${merc.sign} (${merc.degree}°) — как вы мыслите, говорите и выстраиваете аргументы.`;
+  document.getElementById("venusText").textContent = `Венера в ${venus.sign} (${venus.degree}°) — ваши ценности, эстетика и стиль близости.`;
+  document.getElementById("marsText").textContent = `Марс в ${mars.sign} (${mars.degree}°) — способ действовать, отстаивать границы и добиваться результата.`;
+}
+
+function setAnnualText(data){
+  const box=document.getElementById("annualText");
+  if(!box) return;
+  if(!data.months || !data.months.length){box.textContent="Сначала заполните данные рождения.";return;}
+  const cur=data.months[(new Date()).getMonth()];
+  box.textContent=`Текущий месяц: Юпитер активирует дом ${cur.jupiter_house}, Сатурн — дом ${cur.saturn_house}.`;
+}
+
+function setDailyText(data){
+  const box=document.getElementById("dailyText");
+  if(!box) return;
+  if(data.detail){box.textContent=data.detail;return;}
+  if(data.text){box.textContent=data.text;return;}
+  box.textContent="Сначала заполните данные рождения.";
+}
+
+function renderAll(data){
+  setChips(data);
+  setTexts(data);
+  WHEEL_MOUNT.innerHTML = buildWheelSvg(data);
+}
+
+function revealMore(){
+  MORE.classList.remove("hidden");
+}
+
+function openTarget(id){
+  revealMore();
+  const el=document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function selectRating(btn){
+  document.querySelectorAll(".rating-btn").forEach(x=>x.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+async function loadDaily(){
+  const r=await fetch('/api/daily/'+uid);
+  const d=await r.json();
+  setDailyText(d);
+}
+
+async function loadAnnual(){
+  const r=await fetch('/api/annual/'+uid);
+  const d=await r.json();
+  setAnnualText(d);
+}
+
+async function loadChart(){
+  const r=await fetch('/api/chart/'+uid);
+  if(!r.ok) return false;
+  const d=await r.json();
+  renderAll(d);
+  return true;
+}
+
+async function saveProfile(){
+  showError("");
+  const payload={
+    user_id:uid,
+    day:+document.getElementById("day").value,
+    month:+document.getElementById("month").value,
+    year:+document.getElementById("year").value,
+    hour:+document.getElementById("hour").value,
+    minute:+document.getElementById("minute").value,
+    city:document.getElementById("city").value
+  };
+  const r=await fetch('/api/profile',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  });
+  const d=await r.json();
+  if(d.detail){showError(d.detail);return;}
+  renderAll(d);
+  showAnalysis();
+  await Promise.all([loadDaily(),loadAnnual()]);
+}
+
+async function resetProfile(){
+  const ok = confirm('Удалить сохранённые данные профиля?');
+  if(!ok) return;
+  try{
+    const r = await fetch('/api/profile/' + uid, { method:'DELETE' });
+    const d = await r.json();
+    if(!r.ok || d.detail){ showError(d.detail || 'Не удалось удалить профиль'); return; }
+  }catch(err){
+    showError(String(err.message || err));
+    return;
+  }
+  ['day','month','year','hour','minute','city'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  if(ANALYSIS) ANALYSIS.classList.add("hidden");
+  const menu=document.getElementById("optionsMenu");
+  if(menu) menu.classList.add("hidden");
+  const sticky=document.getElementById("stickyBar");
+  if(sticky) sticky.classList.add("hidden");
+  MORE.classList.add("hidden");
+  WHEEL_MOUNT.innerHTML="";
+  document.getElementById("dailyText").textContent="Сначала заполните данные рождения.";
+  document.getElementById("annualText").textContent="Сначала заполните данные рождения.";
+  showError("");
+}
+
+function bindMenu(){
+  document.querySelectorAll('.options-menu-item').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const target=btn.dataset.target;
+      if(target) openTarget(target);
+    });
+  });
+  document.querySelectorAll('.product-card [data-action]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      revealMore();
+      if(btn.dataset.action==='open-calendar') openTarget('option-personal_calendar');
+      if(btn.dataset.action==='open-daily') openTarget('option-daily_horoscope');
+      if(btn.dataset.action==='open-decision') openTarget('option-decision_report');
+      if(btn.dataset.action==='open-compatibility') openTarget('option-compatibility');
+    });
+  });
+  document.querySelectorAll('.rating-btn').forEach(btn=>btn.addEventListener('click',()=>selectRating(btn)));
+  document.getElementById('expandBtn').addEventListener('click',()=>{
+    revealMore();
+    openTarget('options-start');
+  });
+  document.getElementById('jumpMoreBtn').addEventListener('click',()=>{
+    revealMore();
+    openTarget('options-start');
+  });
+  document.getElementById('stickyBar').addEventListener('click',()=>{
+    revealMore();
+    openTarget('options-start');
+  });
+  document.getElementById('showTopBtn').addEventListener('click',()=>{
+    document.querySelector('.screen').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  document.getElementById('resetBtn').addEventListener('click',resetProfile);
+  document.getElementById('calcBtn').addEventListener('click',saveProfile);
+}
+
+(async function init(){
+  bindMenu();
+  if(uid){
+    const loaded = await loadChart();
+    if(loaded){
+      showAnalysis();
+      await Promise.all([loadDaily(),loadAnnual()]);
+    }
+  }
+})();
+</script>
+</body>
+</html>
